@@ -477,7 +477,7 @@ export class AccountSecurityComponent implements OnInit, OnDestroy {
         // prevent duplicate dialog
         biometricsResponseReceived = true;
         if (awaitDesktopDialogRef) {
-          awaitDesktopDialogRef.close(result);
+          await awaitDesktopDialogRef.close(result);
         }
 
         if (!result) {
@@ -494,7 +494,7 @@ export class AccountSecurityComponent implements OnInit, OnDestroy {
         // prevent duplicate dialog
         biometricsResponseReceived = true;
         if (awaitDesktopDialogRef) {
-          awaitDesktopDialogRef.close(true);
+          await awaitDesktopDialogRef.close(true);
         }
 
         if (e.message == "canceled") {
@@ -518,7 +518,7 @@ export class AccountSecurityComponent implements OnInit, OnDestroy {
         }
       } finally {
         if (awaitDesktopDialogRef) {
-          awaitDesktopDialogRef.close(true);
+          await awaitDesktopDialogRef.close(true);
         }
       }
     };

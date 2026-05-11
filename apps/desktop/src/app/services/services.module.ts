@@ -5,6 +5,7 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { Subject, merge } from "rxjs";
 
 import { CollectionService, OrganizationUserApiService } from "@bitwarden/admin-console/common";
+import { DeviceManagementComponentServiceAbstraction } from "@bitwarden/angular/auth/device-management/device-management-component.service.abstraction";
 import { SetInitialPasswordService } from "@bitwarden/angular/auth/password-management/set-initial-password/set-initial-password.service.abstraction";
 import { SafeProvider, safeProvider } from "@bitwarden/angular/platform/utils/safe-provider";
 import {
@@ -120,7 +121,7 @@ import { GlobalStateProvider, StateProvider } from "@bitwarden/common/platform/s
 import { SyncService } from "@bitwarden/common/platform/sync";
 import { CipherService as CipherServiceAbstraction } from "@bitwarden/common/vault/abstractions/cipher.service";
 import { FolderService } from "@bitwarden/common/vault/abstractions/folder/folder.service.abstraction";
-import { DialogService, ToastService } from "@bitwarden/components";
+import { COPY_CLICK_LISTENER, DialogService, ToastService } from "@bitwarden/components";
 import { GeneratorServicesModule } from "@bitwarden/generator-components";
 import { PasswordGenerationServiceAbstraction } from "@bitwarden/generator-legacy";
 import {
@@ -138,6 +139,7 @@ import {
 } from "@bitwarden/key-management-ui";
 import { SerializedMemoryStorageService } from "@bitwarden/storage-core";
 import {
+  CipherFormGenerationService,
   DefaultSshImportPromptService,
   SshImportPromptService,
   VaultFilterServiceAbstraction,
@@ -181,6 +183,9 @@ import { ServerCommunicationConfigService } from "../../platform/services/server
 import { fromIpcMessaging } from "../../platform/utils/from-ipc-messaging";
 import { fromIpcSystemTheme } from "../../platform/utils/from-ipc-system-theme";
 import { BiometricMessageHandlerService } from "../../services/biometric-message-handler.service";
+import { DesktopCredentialGenerationService } from "../../services/desktop-cipher-form-generator.service";
+import { DesktopCopyListenerService } from "../../services/desktop-copy-listener.service";
+import { DesktopDeviceManagementComponentService } from "../../services/desktop-device-management-component.service";
 import { DuckDuckGoMessageHandlerService } from "../../services/duckduckgo-message-handler.service";
 import { EncryptedMessageHandlerService } from "../../services/encrypted-message-handler.service";
 import { NativeMessagingService } from "../../services/native-messaging.service";
@@ -201,6 +206,11 @@ const RELOAD_CALLBACK = new SafeInjectionToken<() => any>("RELOAD_CALLBACK");
 const safeProviders: SafeProvider[] = [
   safeProvider(InitService),
   safeProvider({
+    provide: CipherFormGenerationService,
+    useClass: DesktopCredentialGenerationService,
+    deps: [],
+  }),
+  safeProvider({
     provide: BiometricsService,
     useClass: RendererBiometricsService,
     deps: [TokenService],
@@ -209,6 +219,11 @@ const safeProviders: SafeProvider[] = [
     provide: DesktopBiometricsService,
     useClass: RendererBiometricsService,
     deps: [TokenService],
+  }),
+  safeProvider({
+    provide: DeviceManagementComponentServiceAbstraction,
+    useClass: DesktopDeviceManagementComponentService,
+    deps: [],
   }),
   safeProvider(NativeMessagingService),
   safeProvider(BiometricMessageHandlerService),
@@ -459,14 +474,12 @@ const safeProviders: SafeProvider[] = [
     useClass: DefaultWebAuthnPrfUnlockService,
     deps: [
       WebAuthnLoginPrfKeyServiceAbstraction,
-      KeyServiceAbstraction,
       UserDecryptionOptionsServiceAbstraction,
       EncryptService,
       EnvironmentService,
       PlatformUtilsServiceAbstraction,
       WINDOW,
       LogServiceAbstraction,
-      ConfigService,
     ],
   }),
   safeProvider({
@@ -588,6 +601,7 @@ const safeProviders: SafeProvider[] = [
       StateProvider,
       CollectionService,
       AccountServiceAbstraction,
+      ConfigService,
     ],
   }),
   safeProvider({
@@ -605,6 +619,11 @@ const safeProviders: SafeProvider[] = [
     deps: [Router, RoutedVaultFilterService, VaultFilterServiceAbstraction],
   }),
   safeProvider({
+    provide: COPY_CLICK_LISTENER,
+    useClass: DesktopCopyListenerService,
+    deps: [MessagingServiceAbstraction],
+  }),
+  safeProvider({
     provide: AuthRequestAnsweringService,
     useClass: DesktopAuthRequestAnsweringService,
     deps: [
@@ -615,6 +634,7 @@ const safeProviders: SafeProvider[] = [
       PendingAuthRequestsStateService,
       I18nServiceAbstraction,
       LogService,
+      ConfigService,
     ],
   }),
   safeProvider({

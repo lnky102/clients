@@ -400,7 +400,14 @@ const safeProviders: SafeProvider[] = [
   safeProvider({
     provide: DomainSettingsService,
     useClass: DefaultDomainSettingsService,
-    deps: [StateProvider, PolicyService, AccountService],
+    deps: [
+      StateProvider,
+      PolicyService,
+      AccountService,
+      ConfigService,
+      EnvironmentService,
+      AuthService,
+    ],
   }),
   safeProvider({
     provide: AbstractStorageService,
@@ -663,14 +670,12 @@ const safeProviders: SafeProvider[] = [
     useClass: DefaultWebAuthnPrfUnlockService,
     deps: [
       WebAuthnLoginPrfKeyServiceAbstraction,
-      KeyService,
       UserDecryptionOptionsServiceAbstraction,
       EncryptService,
       EnvironmentService,
       PlatformUtilsService,
       WINDOW,
       LogService,
-      ConfigService,
     ],
   }),
   safeProvider({

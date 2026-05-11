@@ -63,6 +63,18 @@ export abstract class VaultTimeoutSettingsService {
   abstract vaultTimeoutSuppressedUntil$(userId: UserId): Observable<number | null>;
 
   /**
+   * Observable that emits true if vault timeout is currently suppressed for the given user
+   * (i.e. suppression timestamp exists and has not yet elapsed).
+   */
+  abstract isVaultTimeoutSuppressed$(userId: UserId): Observable<boolean>;
+
+  /**
+   * Returns true if vault timeout is currently suppressed for the given user
+   * (i.e. suppression timestamp exists and has not yet elapsed).
+   */
+  abstract isVaultTimeoutSuppressed(userId: UserId): Promise<boolean>;
+
+  /**
    * Suppress vault timeout until the given epoch timestamp (ms).
    * While suppressed, the vault timeout service will not lock or log out users.
    */

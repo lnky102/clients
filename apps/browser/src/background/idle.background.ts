@@ -56,11 +56,10 @@ export default class IdleBackground {
             const allUsers = await firstValueFrom(this.accountService.accounts$);
             for (const userId in allUsers) {
               // Skip if vault timeout is suppressed by shared unlock
-              const suppressedUntil = await firstValueFrom(
-                this.vaultTimeoutSettingsService.vaultTimeoutSuppressedUntil$(userId as UserId),
-              );
-              if (suppressedUntil != null && Date.now() < suppressedUntil) {
-                return;
+              if (
+                await this.vaultTimeoutSettingsService.isVaultTimeoutSuppressed(userId as UserId)
+              ) {
+                continue;
               }
 
               // If the screen is locked or the screensaver activates

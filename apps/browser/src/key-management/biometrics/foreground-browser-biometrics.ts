@@ -88,4 +88,8 @@ export class ForegroundBrowserBiometricsService extends BiometricsService {
       ).result
     );
   }
+  async setBiometricProtectedUnlockKeyForUser(
+    userId: UserId,
+    value: SymmetricCryptoKey,
+  ): Promise<void> {}
 }

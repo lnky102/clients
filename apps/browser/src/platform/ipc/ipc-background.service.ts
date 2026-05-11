@@ -42,8 +42,6 @@ export class IpcBackgroundService extends IpcService {
       this.communicationBackend = new IpcCommunicationBackend({
         send: async (message: OutgoingMessage): Promise<void> => {
           if (typeof message.destination === "object" && "Web" in message.destination) {
-            // Verify the document hasn't changed (e.g., user navigated away) before delivering.
-            // If the browser doesn't support documentId on getFrame, skip the check and send anyway.
             try {
               const frame = await chrome.webNavigation.getFrame({
                 tabId: message.destination.Web.tab_id,
